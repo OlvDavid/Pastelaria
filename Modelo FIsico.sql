@@ -25,11 +25,15 @@ CREATE TABLE pasteis(
     categoria ENUM('Normal', 'Vegano', 'Vegetariano', 'Sem lactose') NOT NULL
 );
 
+SELECT * FROM pasteis;
+
 -- Tabela de Recheios
 CREATE TABLE recheios(
 	id_recheios INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
     descricao VARCHAR(50) NOT NULL
 );
+
+SELECT * FROM recheios;
 
 -- Tabela de tamanho dos Pastéis
 CREATE TABLE tamanho_pasteis(
@@ -43,12 +47,24 @@ CREATE TABLE tamanho_pasteis(
 
 -- Relacionamento entre pastéis e recheios
 CREATE TABLE pastel_recheios(
-	id_recheios INT NOT NULL,
-    id_pasteis INT NOT NULL,
+	id_pasteis INT NOT NULL,
+    id_recheios INT NOT NULL,
     CONSTRAINT fk_pastel_recheios_recheios FOREIGN KEY (id_recheios) REFERENCES recheios(id_recheios),
     CONSTRAINT fk_pastel_recheios_pasteis FOREIGN KEY (id_pasteis) REFERENCES pasteis(id_pasteis),
     PRIMARY KEY (id_recheios, id_pasteis)
 );
+
+SELECT 
+    p.descricao AS Pastel,
+    r.descricao AS Recheio
+FROM 
+    pastel_recheios pr
+JOIN 
+    pasteis p ON pr.id_pasteis = p.id_pasteis
+JOIN 
+    recheios r ON pr.id_recheios = r.id_recheios;
+
+SELECT * FROM pastel_recheios;
 
 -- Tabela de Produtos(Bebida e sobremesa)
 CREATE TABLE produtos(
@@ -57,6 +73,8 @@ CREATE TABLE produtos(
     categoria ENUM('Bebida', 'Sobremesa') NOT NULL,
     preco DECIMAL(8,2) NOT NULL
 );
+
+SELECT * FROM produtos;
 
 -- Tabela de Itens do pedido
 CREATE TABLE itens_pedido(
@@ -78,6 +96,7 @@ CREATE TABLE pedidos(
     forma_pagamento VARCHAR(50) NOT NULL,
     CONSTRAINT fk_pedidos_clientes FOREIGN KEY (id_clientes) REFERENCES clientes(id_clientes)
 );
+
 
 -- Inserindo nomes de pasteis
 INSERT INTO pasteis (descricao, categoria) VALUES
@@ -112,6 +131,12 @@ INSERT INTO recheios (descricao) VALUES
 ('Bacon'),
 ('Calabresa');
 
+INSERT INTO recheios(descricao) VALUES
+('Presunto');
+
+INSERT INTO recheios(descricao) VALUES
+('Requeijão');
+
 -- Inserindo dados dos clientes
 INSERT INTO clientes(nome_completo, nome_social, cpf, telefone, data_nascimento, email, bairro, cidade, estado) VALUES
 ('David da Silva Oliveira', 'David', '089.765.324-36', '(75) 99263-3400', '2003-05-04', 'davidsilva123@gmail.com', 'Pampalona', 'Feira de Santana', 'BA'),
@@ -137,6 +162,31 @@ INSERT INTO produtos(descricao, categoria, preco) VALUES
 ('Bolo de Chocolate', 'Sobremesa', 8.00),
 ('Milk-Shake', 'Sobremesa', 10.00), 
 ('Pudim', 'Sobremesa', 8.00);
+
+INSERT INTO pastel_recheios(id_pasteis, id_recheios) VALUES
+(1, 1);
+
+INSERT INTO pastel_recheios(id_pasteis, id_recheios) VALUES
+(2, 1),
+(2, 2),
+(3, 3),
+(4, 4),
+(5, 5),
+(6, 6),
+(7, 7),
+(8, 8),
+(9, 9),
+(10, 12),
+(11, 10),
+(11, 11),
+(12, 11),
+(12, 2),
+(13, 13),
+(13, 2),
+(14, 2),
+(15, 5),
+(15, 14);
+
 
 
 
