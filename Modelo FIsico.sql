@@ -16,6 +16,8 @@ CREATE TABLE clientes(
     estado CHAR(2) NOT NULL
 );
 
+SELECT * FROM clientes;
+
 -- Tabela de Pastéis
 CREATE TABLE pasteis(
 	id_pasteis INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
@@ -95,7 +97,7 @@ INSERT INTO pasteis (descricao, categoria) VALUES
 ('Queijo Mania', 'Vegetariano'),
 ('Delícia Cremosa de Palmito', 'Vegetariano');
 
--- Inserindo recheios dos pateis
+-- Inserindo recheios dos pasteis
 INSERT INTO recheios (descricao) VALUES
 ('Carne'),
 ('Queijo'),
@@ -109,6 +111,34 @@ INSERT INTO recheios (descricao) VALUES
 ('Camarão'),
 ('Bacon'),
 ('Calabresa');
+
+-- Inserindo dados dos clientes
+INSERT INTO clientes(nome_completo, nome_social, cpf, telefone, data_nascimento, email, bairro, cidade, estado) VALUES
+('David da Silva Oliveira', 'David', '089.765.324-36', '(75) 99263-3400', '2003-05-04', 'davidsilva123@gmail.com', 'Pampalona', 'Feira de Santana', 'BA'),
+('Ana Paula dos Santos', NULL, '123.456.789-01', '(75) 91234-5678', '1990-11-22', 'ana.santos@gmail.com', 'Centro', 'Feira de Santana', 'BA'),
+('Carlos Alberto Souza', 'Carlos', '234.567.890-12', '(75) 98765-4321', '1985-03-15', 'carlos.souza@hotmail.com', 'Tomba', 'Feira de Santana', 'BA'),
+('Mariana Lima Ferreira', 'Mariana', '345.678.901-23', '(75) 99876-5432', '2008-08-30', 'mariana.ferreira@gmail.com', 'Sobradinho', 'Feira de Santana', 'BA'),
+('Roberto Mendes Oliveira', NULL, '456.789.012-34', '(75) 98765-1234', '1999-06-14', 'roberto.mendes@gmail.com', 'Sim', 'Feira de Santana', 'BA'),
+('Juliana Araujo Silva', 'Juliana', '567.890.123-45', '(75) 91234-0987', '2002-12-05', 'juliana.silva@gmail.com', 'Caseb', 'Feira de Santana', 'BA'),
+('Fernando Pereira Santos', NULL, '678.901.234-56', '(75) 92345-6789', '2007-07-25', 'fernando.pereira@gmail.com', 'Mangabeira', 'Feira de Santana', 'BA'),
+('Camila Rocha', NULL, '789.012.345-67', '(75) 93456-7890', '2004-04-18', 'camila.rocha@hotmail.com', 'Cidade Nova', 'Feira de Santana', 'BA'),
+('Lucas Martins', 'Lucas', '890.123.456-78', '(75) 94567-8901', '2009-02-28', 'lucas.martins@gmail.com', 'Brasília', 'Feira de Santana', 'BA'),
+('Isabela Gomes', NULL, '901.234.567-89', '(75) 95678-9012', '1995-10-10', 'isabela.gomes@gmail.com', 'Conceição', 'Feira de Santana', 'BA');
+
+
+-- Inserindo dados dos produtos(bebidas, sobremesas)
+INSERT INTO produtos(descricao, categoria, preco) VALUES
+('Suco de Laranja', 'Bebida', 5.00),
+('Suco de Maracuja', 'Bebida', 5.00),
+('Suco de Abacaxi', 'Bebida', 6.00),
+('Coca cola', 'Bebida', 7.00),
+('Pepsi', 'Bebida', 6.00),
+('Fanta', 'Bebida', 5.00),
+('Bolo de Chocolate', 'Sobremesa', 8.00),
+('Milk-Shake', 'Sobremesa', 10.00), 
+('Pudim', 'Sobremesa', 8.00);
+
+
 
 
 
