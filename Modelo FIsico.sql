@@ -77,25 +77,38 @@ CREATE TABLE pedidos(
     CONSTRAINT fk_pedidos_clientes FOREIGN KEY (id_clientes) REFERENCES clientes(id_clientes)
 );
 
--- Inserindo sabores de pasteis
+-- Inserindo nomes de pasteis
 INSERT INTO pasteis (descricao, categoria) VALUES
-('Pastel de Carne', 'Normal'),
-('Pastel de Queijo', 'Normal'),
-('Pastel de Frango', 'Normal'),
-('Pastel de Pizza', 'Normal'),
-('Pastel de Palmito', 'Vegetariano'),
-('Pastel de Brócolis com Ricota', 'Vegetariano'),
-('Pastel de Soja', 'Vegano'),
-('Pastel de Espinafre', 'Vegano'),
-('Pastel de Tofu', 'Vegano'),
-('Pastel de Banana com Canela', 'Vegetariano'),
-('Pastel de Chocolate', 'Vegetariano'),
-('Pastel de Calabresa', 'Normal'),
-('Pastel de Camarão', 'Normal'),
-('Pastel de Abóbora com Coco', 'Vegano'),
-('Pastel de Berinjela', 'Vegano'),
-('Pastel de Carne Moída com Azeitonas', 'Normal'),
-('Pastel de Presunto e Queijo', 'Normal'),
-('Pastel de Quatro Queijos', 'Vegetariano'),
-('Pastel de Palmito com Requeijão', 'Vegetariano'),
-('Pastel de Abacaxi', 'Vegano');
+('Tradicional da Casa', 'Normal'),
+('Dupla Perfeita', 'Normal'),
+('Clássico Caipira', 'Normal'),
+('Italianíssimo', 'Normal'),
+('Palmito Real', 'Vegetariano'),
+('Delícia Vegetariana', 'Vegano'),
+('Espinafre Crocante', 'Vegano'),
+('Tofu Delícia', 'Vegano'),
+('Choco Irresistível', 'Vegetariano'),
+('Calabresa Sensacional', 'Normal'),
+('Casamento Tropical', 'Normal'),
+('Casamento Perfeito', 'Normal'),
+('Clássico Supremo', 'Normal'),
+('Queijo Mania', 'Vegetariano'),
+('Delícia Cremosa de Palmito', 'Vegetariano');
+
+-- Inserindo recheios dos pateis
+INSERT INTO recheios (descricao) VALUES
+('Carne'),
+('Queijo'),
+('Frango'),
+('Pizza'),
+('Palmito'),
+('Soja'),
+('Espinafre'),
+('Tofu'),
+('Chocolate'),
+('Camarão'),
+('Bacon'),
+('Calabresa');
+
+
+
