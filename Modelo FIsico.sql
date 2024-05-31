@@ -76,10 +76,26 @@ CREATE TABLE pedidos(
     forma_pagamento VARCHAR(50) NOT NULL,
     CONSTRAINT fk_pedidos_clientes FOREIGN KEY (id_clientes) REFERENCES clientes(id_clientes)
 );
-    
 
-
-
-	
-
-
+-- Inserindo sabores de pasteis
+INSERT INTO pasteis (descricao, categoria) VALUES
+('Pastel de Carne', 'Normal'),
+('Pastel de Queijo', 'Normal'),
+('Pastel de Frango', 'Normal'),
+('Pastel de Pizza', 'Normal'),
+('Pastel de Palmito', 'Vegetariano'),
+('Pastel de Brócolis com Ricota', 'Vegetariano'),
+('Pastel de Soja', 'Vegano'),
+('Pastel de Espinafre', 'Vegano'),
+('Pastel de Tofu', 'Vegano'),
+('Pastel de Banana com Canela', 'Vegetariano'),
+('Pastel de Chocolate', 'Vegetariano'),
+('Pastel de Calabresa', 'Normal'),
+('Pastel de Camarão', 'Normal'),
+('Pastel de Abóbora com Coco', 'Vegano'),
+('Pastel de Berinjela', 'Vegano'),
+('Pastel de Carne Moída com Azeitonas', 'Normal'),
+('Pastel de Presunto e Queijo', 'Normal'),
+('Pastel de Quatro Queijos', 'Vegetariano'),
+('Pastel de Palmito com Requeijão', 'Vegetariano'),
+('Pastel de Abacaxi', 'Vegano');
