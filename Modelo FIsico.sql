@@ -38,11 +38,10 @@ SELECT * FROM recheios;
 -- Tabela de tamanho dos Pastéis
 CREATE TABLE tamanho_pasteis(
 	id_tamanho_pasteis INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-    tamanho CHAR(5) NOT NULL UNIQUE,
+    tamanho ENUM ('P', 'M', 'G') NOT NULL,
     preco DECIMAL(8,2) NOT NULL,
     id_pasteis INT NOT NULL,
-    CONSTRAINT fk_tamanho_pasteis_pasteis FOREIGN KEY (id_pasteis) REFERENCES pasteis(id_pasteis),
-    CONSTRAINT chk_tamanho CHECK (tamanho IN ('P', 'M', 'G'))
+    CONSTRAINT fk_tamanho_pasteis_pasteis FOREIGN KEY (id_pasteis) REFERENCES pasteis(id_pasteis)
 );
 
 -- Relacionamento entre pastéis e recheios
@@ -121,7 +120,7 @@ INSERT INTO recheios (descricao) VALUES
 ('Carne'),
 ('Queijo'),
 ('Frango'),
-('Pizza'),
+('Tomate com Orégano'),
 ('Palmito'),
 ('Soja'),
 ('Espinafre'),
@@ -171,6 +170,8 @@ INSERT INTO pastel_recheios(id_pasteis, id_recheios) VALUES
 (2, 2),
 (3, 3),
 (4, 4),
+(4, 13),
+(4, 2),
 (5, 5),
 (6, 6),
 (7, 7),
@@ -186,6 +187,55 @@ INSERT INTO pastel_recheios(id_pasteis, id_recheios) VALUES
 (14, 2),
 (15, 5),
 (15, 14);
+
+INSERT INTO tamanho_pasteis(tamanho, preco, id_pasteis) VALUES
+('P', 05.00, 1),
+('M', 07.00, 1),
+('G', 10.00, 1),
+('P', 7.00, 2),
+('M', 9.00, 2),
+('G', 12.00, 2),
+('P', 05.00, 3),
+('M', 07.00, 3),
+('G', 10.00, 3),
+('P', 07.00, 4),
+('M', 10.00, 4),
+('G', 12.00, 4),
+('P', 9.00, 5),
+('M', 12.00, 5),
+('G', 15.00, 5),
+('P', 9.00, 6),
+('M', 12.00, 6),
+('G', 15.00, 6),
+('P', 9.00, 7),
+('M', 12.00, 7),
+('G', 15.00, 7),
+('P', 9.00, 8),
+('M', 12.00, 8),
+('G', 15.00, 8),
+('P', 9.00, 9),
+('M', 12.00, 9),
+('G', 15.00, 9),
+('P', 5.00, 10),
+('M', 7.00, 10),
+('G', 10.00, 10),
+('P', 9.00, 11),
+('M', 12.00, 11),
+('G', 15.00, 11),
+('P', 7.00, 12),
+('M', 9.00, 12),
+('G', 12.00, 12),
+('P', 7.00, 13),
+('M', 9.00, 13),
+('G', 12.00, 13),
+('P', 5.00, 14),
+('M', 7.00, 14),
+('G', 10.00, 14),
+('P', 9.00, 15),
+('M', 12.00, 15),
+('G', 15.00, 15);
+
+SELECT * FROM tamanho_pasteis;
 
 
 
