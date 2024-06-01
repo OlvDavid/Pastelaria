@@ -237,6 +237,21 @@ INSERT INTO tamanho_pasteis(tamanho, preco, id_pasteis) VALUES
 
 SELECT * FROM tamanho_pasteis;
 
+INSERT INTO itens_pedido (id_produtos, id_pedido, id_tamanho_pastel, quantidade) VALUES
+(1, 1, 27, 2),
+(3, 2, 33, 3),
+(2, 3, 22, 1);
+
+SELECT * FROM itens_pedido;
+
+INSERT INTO pedidos (id_clientes, data_pedido, forma_pagamento) VALUES
+(1, '2023-05-31', 'Dinheiro'),
+(2, '2023-05-29', 'Débito'),
+(3, '2023-05-11', 'Crédito');
+
+SELECT * FROM pedidos;
+
+
 
 
 
