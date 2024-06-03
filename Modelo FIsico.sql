@@ -302,10 +302,32 @@ WHERE
 GROUP BY 
     p.descricao;
 
+-- 10. VIEW 1, lista todas as vendas feitas no débito. 
 
+CREATE VIEW vendas_debito AS
+SELECT id_clientes, data_pedido, forma_pagamento
+FROM pedidos
+WHERE forma_pagamento = 'Débito';
 
+SELECT * FROM vendas_debito;
 
+-- 10. VIEW 2, lista todos os pasteis veganos.
 
+CREATE VIEW pasteis_veganos AS
+SELECT id_pasteis, descricao, categoria
+FROM pasteis
+WHERE categoria = 'Vegano';
+
+SELECT * FROM pasteis_veganos;
+
+-- 10. VIEW 3, lista todos os clientes nascidos após 1999.
+
+CREATE VIEW clientes_nasc_depois_2000 AS
+SELECT nome_completo, nome_social, cpf, telefone, data_nascimento, email, bairro, cidade, estado
+FROM clientes
+WHERE data_nascimento > '1999-12-31';
+
+SELECT * FROM clientes_nasc_depois_2000;
 
 
 
