@@ -53,6 +53,8 @@ CREATE TABLE pastel_recheios(
     PRIMARY KEY (id_recheios, id_pasteis)
 );
 
+-- View de relacionamento de tabelas do pastel e recheios	
+CREATE VIEW pastel_recheio_view AS
 SELECT 
     p.descricao AS Pastel,
     r.descricao AS Recheio
@@ -63,7 +65,7 @@ JOIN
 JOIN 
     recheios r ON pr.id_recheios = r.id_recheios;
 
-SELECT * FROM pastel_recheios;
+SELECT * FROM pastel_recheio_view;
 
 -- Tabela de Produtos(Bebida e sobremesa)
 CREATE TABLE produtos(
@@ -240,16 +242,68 @@ SELECT * FROM tamanho_pasteis;
 INSERT INTO itens_pedido (id_produtos, id_pedido, id_tamanho_pastel, quantidade) VALUES
 (1, 1, 27, 2),
 (3, 2, 33, 3),
-(2, 3, 22, 1);
+(2, 3, 22, 1),
+(5, 4, 20, 1);
+
+INSERT INTO itens_pedido (id_produtos, id_pedido, id_tamanho_pastel, quantidade) VALUES
+(7, 5, 17, 2),
+(4, 6, 3, 4);
+
+
 
 SELECT * FROM itens_pedido;
 
 INSERT INTO pedidos (id_clientes, data_pedido, forma_pagamento) VALUES
 (1, '2023-05-31', 'Dinheiro'),
 (2, '2023-05-29', 'Débito'),
-(3, '2023-05-11', 'Crédito');
+(3, '2023-05-11', 'Crédito'),
+(4, '2024-03-29', 'Pix'),
+(5, '2024-02-01', 'Dinheiro'),
+(6, '2024-02-10', 'Dinheiro'),
+(7, '2024-01-22', 'Crédito'),
+(8, '2024-05-04', 'Pix'),
+(9, '2023-12-31', 'Débito'),
+(10, '2024-01-01', 'Dinheiro');
+
 
 SELECT * FROM pedidos;
+
+-- 1. Liste os nomes de todos os pastéis veganos vendidos para pessoas com mais de 18 anos.
+SELECT DISTINCT 
+    p.descricao AS Pastel_Vegano,
+    c.nome_completo AS Nome_Cliente,
+    c.data_nascimento AS Data_Nascimento
+FROM 
+    pasteis p
+JOIN 
+    tamanho_pasteis tp ON p.id_pasteis = tp.id_pasteis
+JOIN 
+    itens_pedido ip ON tp.id_tamanho_pasteis = ip.id_tamanho_pastel
+JOIN 
+    pedidos pe ON ip.id_pedido = pe.id_pedidos
+JOIN 
+    clientes c ON pe.id_clientes = c.id_clientes
+WHERE 
+    p.categoria = 'Vegano'
+    AND TIMESTAMPDIFF(YEAR, c.data_nascimento, CURDATE()) > 18;
+
+-- 3. Liste todos os pastéis que possuem bacon e/ou queijo em seu recheio.    
+SELECT 
+    p.descricao AS Pastel,
+    GROUP_CONCAT(r.descricao ORDER BY r.descricao SEPARATOR ', ') AS Recheios
+FROM 
+    pasteis p
+JOIN 
+    pastel_recheios pr ON p.id_pasteis = pr.id_pasteis
+JOIN 
+    recheios r ON pr.id_recheios = r.id_recheios
+WHERE 
+    r.descricao IN ('Bacon', 'Queijo')
+GROUP BY 
+    p.descricao;
+
+
+
 
 
 
