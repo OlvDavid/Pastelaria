@@ -249,6 +249,11 @@ INSERT INTO itens_pedido (id_produtos, id_pedido, id_tamanho_pastel, quantidade)
 (7, 5, 17, 2),
 (4, 6, 3, 4);
 
+INSERT INTO itens_pedido (id_produtos, id_pedido, id_tamanho_pastel, quantidade) VALUES
+(3, 7, 19, 5),
+(6, 8, 45, 3),
+(8, 9, 43, 8);
+
 
 
 SELECT * FROM itens_pedido;
@@ -286,6 +291,34 @@ JOIN
 WHERE 
     p.categoria = 'Vegano'
     AND TIMESTAMPDIFF(YEAR, c.data_nascimento, CURDATE()) > 18;
+    
+-- 2.Liste os clientes com maior número de pedidos realizados em 1 ano agrupados por mês
+CREATE OR REPLACE VIEW view_maior_numero_pedidos_por_cliente AS
+SELECT
+    ano,
+    mes,
+    cliente,
+    total_pedidos
+FROM (
+    SELECT
+        YEAR(data_pedido) AS ano,
+        MONTH(data_pedido) AS mes,
+        c.nome_completo AS cliente,
+        COUNT(*) AS total_pedidos,
+        RANK() OVER (PARTITION BY YEAR(data_pedido), MONTH(data_pedido) ORDER BY COUNT(*) DESC) AS ranking
+    FROM
+        pedidos p
+    JOIN
+        clientes c ON p.id_clientes = c.id_clientes
+    GROUP BY
+        YEAR(data_pedido),
+        MONTH(data_pedido),
+        c.nome_completo
+) AS pedidos_ranking
+WHERE
+    ranking = 1;
+    
+SELECT * FROM view_maior_numero_pedidos_por_cliente;
 
 -- 3. Liste todos os pastéis que possuem bacon e/ou queijo em seu recheio.    
 SELECT 
@@ -301,6 +334,70 @@ WHERE
     r.descricao IN ('Bacon', 'Queijo')
 GROUP BY 
     p.descricao;
+    
+-- 4 Mostre o valor de venda total de todos os pastéis cadastrados no sistema.
+SELECT CONCAT(SUM(preco * tamanho), ' Reais') AS valor_total_venda
+FROM tamanho_pasteis;
+
+-- 5 Liste todos os pedidos onde há pelo menos um pastel e uma bebida.
+CREATE OR REPLACE VIEW view_pedidos_pastel_bebida AS
+SELECT
+    p.id_pedidos AS pedido_id,
+    p.data_pedido,
+    c.nome_completo AS cliente_nome,
+    MIN(ip.id_itens_pedido) AS item_pedido_id,
+    pr.descricao AS produto_nome,
+    pr.categoria AS categoria_produto,
+    pst.descricao AS descricao_pastel,  -- Substituído pelo nome do pastel
+    tp.tamanho AS tamanho_pastel
+FROM
+    pedidos p
+JOIN
+    clientes c ON p.id_clientes = c.id_clientes
+JOIN
+    itens_pedido ip ON p.id_pedidos = ip.id_pedido
+JOIN
+    produtos pr ON ip.id_produtos = pr.id_produtos
+JOIN
+    tamanho_pasteis tp ON ip.id_tamanho_pastel = tp.id_tamanho_pasteis
+JOIN
+    pasteis pst ON tp.id_pasteis = pst.id_pasteis  -- Junção com a tabela de pasteis
+WHERE
+    pr.categoria IN ('Bebida', 'Normal', 'Vegano', 'Vegetariano') AND
+    (pr.descricao IN (SELECT descricao FROM pasteis) OR pr.categoria = 'Bebida')
+GROUP BY
+    p.id_pedidos, p.data_pedido, c.nome_completo, pr.descricao, pr.categoria, pst.descricao, tp.tamanho;
+    
+SELECT * FROM view_pedidos_pastel_bebida;
+
+-- 6. Liste quais são os pastéis mais vendidos, incluindo a quantidade de vendas em ordem decrescente.
+CREATE OR REPLACE VIEW view_pasteis_mais_vendidos AS
+SELECT
+    p.id_pasteis AS id_pastel,
+    p.descricao AS descricao_pastel,
+    COUNT(ip.id_itens_pedido) AS total_vendas,
+    RANK() OVER (ORDER BY COUNT(ip.id_itens_pedido) DESC) AS ranking
+FROM
+    pasteis p
+JOIN
+    tamanho_pasteis tp ON p.id_pasteis = tp.id_pasteis
+JOIN
+    itens_pedido ip ON tp.id_tamanho_pasteis = ip.id_tamanho_pastel
+GROUP BY
+    p.id_pasteis,
+    p.descricao;
+    
+SELECT * FROM view_pasteis_mais_vendidos;
+
+-- 8. FUNÇÂO 1, calcular idade do cliente.
+CREATE FUNCTION fn_idade (data_nascimento DATE)
+RETURNS INT 
+DETERMINISTIC
+RETURN FLOOR(DATEDIFF(NOW(), data_nascimento)/365.25);
+
+SELECT *, fn_idade(data_nascimento) idade
+FROM clientes;
+    
 
 -- 10. VIEW 1, lista todas as vendas feitas no débito. 
 
