@@ -426,7 +426,24 @@ WHERE data_nascimento > '1999-12-31';
 
 SELECT * FROM clientes_nasc_depois_2000;
 
+-- Insert de mais 10 clientes
+INSERT INTO clientes(nome_completo, nome_social, cpf, telefone, data_nascimento, email, bairro, cidade, estado) VALUES
+('Fábio Souza', NULL, '234.567.890-99', '(75) 98987-6543', '1997-08-12', 'fabio.souza@gmail.com', 'Brasília', 'Feira de Santana', 'BA'),
+('Larissa Oliveira', NULL, '345.678.901-88', '(75) 97865-4321', '1980-10-25', 'larissa.oliveira@hotmail.com', 'Centro', 'Feira de Santana', 'BA'),
+('Paulo Silva', NULL, '456.789.012-77', '(75) 96789-0123', '1973-03-19', 'paulo.silva@gmail.com', 'Pampalona', 'Feira de Santana', 'BA'),
+('Renata Santos', NULL, '567.890.123-66', '(75) 95678-9812', '1998-11-07', 'renata.santos@yahoo.com.br', 'Cidade Nova', 'Feira de Santana', 'BA'),
+('Marcelo Lima', NULL, '678.901.234-55', '(75) 94367-8901', '1985-06-30', 'marcelo.lima@gmail.com', 'Tomba', 'Feira de Santana', 'BA'),
+('Tatiane Pereira', NULL, '789.012.345-44', '(75) 93486-7890', '1990-12-15', 'tatiane.pereira@hotmail.com', 'Cidade Nova', 'Feira de Santana', 'BA'),
+('Roberto Oliveira', NULL, '890.123.456-33', '(75) 92345-6786', '1979-05-28', 'roberto.oliveira@yahoo.com.br', 'Sobradinho', 'Feira de Santana', 'BA'),
+('Carla Souza', NULL, '901.234.567-22', '(75) 91234-5673', '1988-09-03', 'carla.souza@gmail.com', 'Cidade Nova', 'Feira de Santana', 'BA'),
+('Luciano Santos', NULL, '012.345.678-11', '(75) 90123-4567', '1977-04-14', 'luciano.santos@hotmail.com', 'Cidade Nova', 'Feira de Santana', 'BA'),
+('Vanessa Lima', NULL, '123.456.789-00', '(75) 99012-3456', '1995-01-20', 'vanessa.lima@yahoo.com.br', 'Cidade Nova', 'Feira de Santana', 'BA');
 
+-- 10. VIEW 4, lista todos os clientes do bairro Cidade Nova.
 
+CREATE VIEW clientes_bairro AS
+SELECT nome_completo, nome_social, cpf, telefone, data_nascimento, email, bairro, cidade, estado
+FROM clientes
+WHERE  bairro = 'Cidade Nova';
 
-
+SELECT * FROM clientes_bairro;
