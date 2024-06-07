@@ -68,23 +68,23 @@ JOIN
 SELECT * FROM pastel_recheio_view;
 
 -- Tabela de Produtos(Bebida e sobremesa)
-CREATE TABLE produtos(
-	id_produtos INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+CREATE TABLE acompanhamentos(
+	id_acompanhamento INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
     descricao VARCHAR(50) NOT NULL,
     categoria ENUM('Bebida', 'Sobremesa') NOT NULL,
     preco DECIMAL(8,2) NOT NULL
 );
 
-SELECT * FROM produtos;
+SELECT * FROM acompanhamentos;
 
 -- Tabela de Itens do pedido
 CREATE TABLE itens_pedido(
 	id_itens_pedido INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-    id_produtos INT NOT NULL,
+    id_acompanhamento INT NOT NULL,
     id_pedido INT NOT NULL,
     id_tamanho_pastel INT NOT NULL,
     quantidade INT NOT NULL,
-    CONSTRAINT fk_itens_pedido_produtos FOREIGN KEY (id_produtos) REFERENCES produtos(id_produtos),
+    CONSTRAINT fk_itens_pedido_produtos FOREIGN KEY (id_acompanhamento) REFERENCES acompanhamentos(id_acompanhamento),
     CONSTRAINT fk_itens_pedido_pedido FOREIGN KEY (id_pedido) REFERENCES pedidos(id_pedidos),
     CONSTRAINT fk_itens_pedido_tamanho_pastel FOREIGN KEY (id_tamanho_pastel) REFERENCES tamanho_pasteis(id_tamanho_pasteis)
 );
@@ -153,7 +153,7 @@ INSERT INTO clientes(nome_completo, nome_social, cpf, telefone, data_nascimento,
 
 
 -- Inserindo dados dos produtos(bebidas, sobremesas)
-INSERT INTO produtos(descricao, categoria, preco) VALUES
+INSERT INTO acompanhamentos(descricao, categoria, preco) VALUES
 ('Suco de Laranja', 'Bebida', 5.00),
 ('Suco de Maracuja', 'Bebida', 5.00),
 ('Suco de Abacaxi', 'Bebida', 6.00),
@@ -239,17 +239,17 @@ INSERT INTO tamanho_pasteis(tamanho, preco, id_pasteis) VALUES
 
 SELECT * FROM tamanho_pasteis;
 
-INSERT INTO itens_pedido (id_produtos, id_pedido, id_tamanho_pastel, quantidade) VALUES
+INSERT INTO itens_pedido (id_acompanhamento, id_pedido, id_tamanho_pastel, quantidade) VALUES
 (1, 1, 27, 2),
 (3, 2, 33, 3),
 (2, 3, 22, 1),
 (5, 4, 20, 1);
 
-INSERT INTO itens_pedido (id_produtos, id_pedido, id_tamanho_pastel, quantidade) VALUES
+INSERT INTO itens_pedido (id_acompanhamento, id_pedido, id_tamanho_pastel, quantidade) VALUES
 (7, 5, 17, 2),
 (4, 6, 3, 4);
 
-INSERT INTO itens_pedido (id_produtos, id_pedido, id_tamanho_pastel, quantidade) VALUES
+INSERT INTO itens_pedido (id_acompanhamento, id_pedido, id_tamanho_pastel, quantidade) VALUES
 (3, 7, 19, 5),
 (6, 8, 45, 3),
 (8, 9, 43, 8);
@@ -340,34 +340,33 @@ SELECT CONCAT(SUM(preco * tamanho), ' Reais') AS valor_total_venda
 FROM tamanho_pasteis;
 
 -- 5 Liste todos os pedidos onde há pelo menos um pastel e uma bebida.
-CREATE OR REPLACE VIEW view_pedidos_pastel_bebida AS
-SELECT
-    p.id_pedidos AS pedido_id,
-    p.data_pedido,
-    c.nome_completo AS cliente_nome,
-    MIN(ip.id_itens_pedido) AS item_pedido_id,
-    pr.descricao AS produto_nome,
-    pr.categoria AS categoria_produto,
-    pst.descricao AS descricao_pastel,  -- Substituído pelo nome do pastel
-    tp.tamanho AS tamanho_pastel
-FROM
-    pedidos p
-JOIN
-    clientes c ON p.id_clientes = c.id_clientes
-JOIN
-    itens_pedido ip ON p.id_pedidos = ip.id_pedido
-JOIN
-    produtos pr ON ip.id_produtos = pr.id_produtos
-JOIN
-    tamanho_pasteis tp ON ip.id_tamanho_pastel = tp.id_tamanho_pasteis
-JOIN
-    pasteis pst ON tp.id_pasteis = pst.id_pasteis  -- Junção com a tabela de pasteis
-WHERE
-    pr.categoria IN ('Bebida', 'Normal', 'Vegano', 'Vegetariano') AND
-    (pr.descricao IN (SELECT descricao FROM pasteis) OR pr.categoria = 'Bebida')
-GROUP BY
-    p.id_pedidos, p.data_pedido, c.nome_completo, pr.descricao, pr.categoria, pst.descricao, tp.tamanho;
-    
+CREATE OR REPLACE VIEW view_pedidos_pastel_bebida AS 
+SELECT 
+    p.id_pedidos AS pedido_id, 
+    p.data_pedido, 
+    c.nome_completo AS cliente_nome, 
+    MIN(ip.id_itens_pedido) AS item_pedido_id, 
+    ac.descricao AS produto_nome, 
+    ac.categoria AS categoria_acompanhamento, 
+    pst.descricao AS descricao_pastel, -- Substituído pelo nome do pastel 
+    tp.tamanho AS tamanho_pastel 
+FROM 
+    pedidos p 
+JOIN 
+    clientes c ON p.id_clientes = c.id_clientes 
+JOIN 
+    itens_pedido ip ON p.id_pedidos = ip.id_pedido 
+JOIN 
+    acompanhamentos ac ON ip.id_acompanhamento = ac.id_acompanhamento 
+JOIN 
+    tamanho_pasteis tp ON ip.id_tamanho_pastel = tp.id_tamanho_pasteis 
+JOIN 
+    pasteis pst ON tp.id_pasteis = pst.id_pasteis -- Junção com a tabela de pasteis 
+WHERE 
+    ac.categoria = 'Bebida' OR ac.id_acompanhamento IN (SELECT id_pasteis FROM tamanho_pasteis) 
+GROUP BY 
+    p.id_pedidos, p.data_pedido, c.nome_completo, ac.descricao, ac.categoria, pst.descricao, tp.tamanho;
+
 SELECT * FROM view_pedidos_pastel_bebida;
 
 -- 6. Liste quais são os pastéis mais vendidos, incluindo a quantidade de vendas em ordem decrescente.
