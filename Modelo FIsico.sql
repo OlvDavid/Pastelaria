@@ -642,7 +642,22 @@ SELECT numero_aleatorio();
 
 -- ---------------------------SEÇÃO DE PROCEDURES----------------------
 
+-- 7, PROCEDURE 1, mudar valor do acompanhamento
+DELIMITER //
 
+CREATE PROCEDURE atualizar_preco_acompanhamento(
+    IN descricao_acompanhamento VARCHAR(50),
+    IN novo_preco DECIMAL(8,2)
+)
+BEGIN
+    UPDATE acompanhamentos
+    SET preco = novo_preco
+    WHERE descricao = descricao_acompanhamento AND id_acompanhamento > 0;
+END //
+
+DELIMITER ;
+
+CALL atualizar_preco_acompanhamento('Suco de Laranja', 7.00);
 
 
 
