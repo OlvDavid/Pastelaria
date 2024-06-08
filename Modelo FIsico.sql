@@ -396,6 +396,31 @@ RETURN FLOOR(DATEDIFF(NOW(), data_nascimento)/365.25);
 
 SELECT *, fn_idade(data_nascimento) idade
 FROM clientes;
+
+-- 8. FUNÇÃO 2, calcula valor total do pedido.
+DELIMITER //
+
+CREATE FUNCTION fn_calcula_total_pedido (p_id_pedido INT) 
+RETURNS DECIMAL(10,2)
+READS SQL DATA
+BEGIN
+    DECLARE v_total DECIMAL(10,2);
+
+    SELECT SUM(ip.quantidade * COALESCE(t.preco, a.preco))
+    INTO v_total
+    FROM itens_pedido ip
+    LEFT JOIN tamanho_pasteis t ON ip.id_tamanho_pastel = t.id_tamanho_pasteis
+    LEFT JOIN acompanhamentos a ON ip.id_acompanhamento = a.id_acompanhamento
+    WHERE ip.id_pedido = p_id_pedido;
+
+    RETURN v_total;
+END;
+
+//
+
+DELIMITER ;
+
+SELECT fn_calcula_total_pedido(9) AS total;
     
 
 -- 10. VIEW 1, lista todas as vendas feitas no débito. 
