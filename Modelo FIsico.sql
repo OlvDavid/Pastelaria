@@ -93,6 +93,7 @@ CREATE TABLE itens_pedido(
 CREATE TABLE pedidos(
 	id_pedidos INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
     id_clientes INT NOT NULL,
+    numero_pedido INT NOT NULL,
     data_pedido DATE NOT NULL,
     forma_pagamento VARCHAR(50) NOT NULL,
     CONSTRAINT fk_pedidos_clientes FOREIGN KEY (id_clientes) REFERENCES clientes(id_clientes)
@@ -130,12 +131,8 @@ INSERT INTO recheios (descricao) VALUES
 ('Chocolate'),
 ('Camarão'),
 ('Bacon'),
-('Calabresa');
-
-INSERT INTO recheios(descricao) VALUES
-('Presunto');
-
-INSERT INTO recheios(descricao) VALUES
+('Calabresa'),
+('Presunto'),
 ('Requeijão');
 
 -- Inserindo dados dos clientes
@@ -149,7 +146,18 @@ INSERT INTO clientes(nome_completo, nome_social, cpf, telefone, data_nascimento,
 ('Fernando Pereira Santos', NULL, '678.901.234-56', '(75) 92345-6789', '2007-07-25', 'fernando.pereira@gmail.com', 'Mangabeira', 'Feira de Santana', 'BA'),
 ('Camila Rocha', NULL, '789.012.345-67', '(75) 93456-7890', '2004-04-18', 'camila.rocha@hotmail.com', 'Cidade Nova', 'Feira de Santana', 'BA'),
 ('Lucas Martins', 'Lucas', '890.123.456-78', '(75) 94567-8901', '2009-02-28', 'lucas.martins@gmail.com', 'Brasília', 'Feira de Santana', 'BA'),
-('Isabela Gomes', NULL, '901.234.567-89', '(75) 95678-9012', '1995-10-10', 'isabela.gomes@gmail.com', 'Conceição', 'Feira de Santana', 'BA');
+('Isabela Gomes', NULL, '901.234.567-89', '(75) 95678-9012', '1995-10-10', 'isabela.gomes@gmail.com', 'Conceição', 'Feira de Santana', 'BA'),
+('Fábio Souza', NULL, '234.567.890-99', '(75) 98987-6543', '1997-08-12', 'fabio.souza@gmail.com', 'Brasília', 'Feira de Santana', 'BA'),
+('Larissa Oliveira', NULL, '345.678.901-88', '(75) 97865-4321', '1980-10-25', 'larissa.oliveira@hotmail.com', 'Centro', 'Feira de Santana', 'BA'),
+('Paulo Silva', NULL, '456.789.012-77', '(75) 96789-0123', '1973-03-19', 'paulo.silva@gmail.com', 'Pampalona', 'Feira de Santana', 'BA'),
+('Renata Santos', NULL, '567.890.123-66', '(75) 95678-9812', '1998-11-07', 'renata.santos@yahoo.com.br', 'Cidade Nova', 'Feira de Santana', 'BA'),
+('Marcelo Lima', NULL, '678.901.234-55', '(75) 94367-8901', '1985-06-30', 'marcelo.lima@gmail.com', 'Tomba', 'Feira de Santana', 'BA'),
+('Tatiane Pereira', NULL, '789.012.345-44', '(75) 93486-7890', '1990-12-15', 'tatiane.pereira@hotmail.com', 'Cidade Nova', 'Feira de Santana', 'BA'),
+('Roberto Oliveira', NULL, '890.123.456-33', '(75) 92345-6786', '1979-05-28', 'roberto.oliveira@yahoo.com.br', 'Sobradinho', 'Feira de Santana', 'BA'),
+('Carla Souza', NULL, '901.234.567-22', '(75) 91234-5673', '1988-09-03', 'carla.souza@gmail.com', 'Cidade Nova', 'Feira de Santana', 'BA'),
+('Luciano Santos', NULL, '012.345.678-11', '(75) 90123-4567', '1977-04-14', 'luciano.santos@hotmail.com', 'Cidade Nova', 'Feira de Santana', 'BA'),
+('Vanessa Lima', NULL, '123.456.789-00', '(75) 99012-3456', '1995-01-20', 'vanessa.lima@yahoo.com.br', 'Cidade Nova', 'Feira de Santana', 'BA');
+
 
 
 -- Inserindo dados dos produtos(bebidas, sobremesas)
@@ -165,9 +173,7 @@ INSERT INTO acompanhamentos(descricao, categoria, preco) VALUES
 ('Pudim', 'Sobremesa', 8.00);
 
 INSERT INTO pastel_recheios(id_pasteis, id_recheios) VALUES
-(1, 1);
-
-INSERT INTO pastel_recheios(id_pasteis, id_recheios) VALUES
+(1, 1),
 (2, 1),
 (2, 2),
 (3, 3),
@@ -243,18 +249,12 @@ INSERT INTO itens_pedido (id_acompanhamento, id_pedido, id_tamanho_pastel, quant
 (1, 1, 27, 2),
 (3, 2, 33, 3),
 (2, 3, 22, 1),
-(5, 4, 20, 1);
-
-INSERT INTO itens_pedido (id_acompanhamento, id_pedido, id_tamanho_pastel, quantidade) VALUES
+(5, 4, 20, 1),
 (7, 5, 17, 2),
-(4, 6, 3, 4);
-
-INSERT INTO itens_pedido (id_acompanhamento, id_pedido, id_tamanho_pastel, quantidade) VALUES
+(4, 6, 3, 4),
 (3, 7, 19, 5),
 (6, 8, 45, 3),
 (8, 9, 43, 8);
-
-
 
 SELECT * FROM itens_pedido;
 
@@ -272,6 +272,8 @@ INSERT INTO pedidos (id_clientes, data_pedido, forma_pagamento) VALUES
 
 
 SELECT * FROM pedidos;
+
+-- ----------------------------------------SEÇÃO DE VIEWS---------------------------------
 
 -- 1. Liste os nomes de todos os pastéis veganos vendidos para pessoas com mais de 18 anos.
 SELECT DISTINCT 
@@ -401,41 +403,6 @@ GROUP BY
     
 SELECT * FROM view_pasteis_mais_vendidos;
 
--- 8. FUNÇÂO 1, calcular idade do cliente.
-CREATE FUNCTION fn_idade (data_nascimento DATE)
-RETURNS INT 
-DETERMINISTIC
-RETURN FLOOR(DATEDIFF(NOW(), data_nascimento)/365.25);
-
-SELECT *, fn_idade(data_nascimento) idade
-FROM clientes;
-
--- 8. FUNÇÃO 2, calcula valor total do pedido.
-DELIMITER //
-
-CREATE FUNCTION fn_calcula_total_pedido (p_id_pedido INT) 
-RETURNS DECIMAL(10,2)
-READS SQL DATA
-BEGIN
-    DECLARE v_total DECIMAL(10,2);
-
-    SELECT SUM(ip.quantidade * COALESCE(t.preco, a.preco))
-    INTO v_total
-    FROM itens_pedido ip
-    LEFT JOIN tamanho_pasteis t ON ip.id_tamanho_pastel = t.id_tamanho_pasteis
-    LEFT JOIN acompanhamentos a ON ip.id_acompanhamento = a.id_acompanhamento
-    WHERE ip.id_pedido = p_id_pedido;
-
-    RETURN v_total;
-END;
-
-//
-
-DELIMITER ;
-
-SELECT fn_calcula_total_pedido(8) AS total;
-    
-
 -- 10. VIEW 1, lista todas as vendas feitas no débito. 
 
 CREATE VIEW vendas_debito AS
@@ -462,21 +429,6 @@ FROM clientes
 WHERE data_nascimento > '1999-12-31';
 
 SELECT * FROM clientes_nasc_depois_2000;
-
--- Insert de mais 10 clientes
-INSERT INTO clientes(nome_completo, nome_social, cpf, telefone, data_nascimento, email, bairro, cidade, estado) VALUES
-('Fábio Souza', NULL, '234.567.890-99', '(75) 98987-6543', '1997-08-12', 'fabio.souza@gmail.com', 'Brasília', 'Feira de Santana', 'BA'),
-('Larissa Oliveira', NULL, '345.678.901-88', '(75) 97865-4321', '1980-10-25', 'larissa.oliveira@hotmail.com', 'Centro', 'Feira de Santana', 'BA'),
-('Paulo Silva', NULL, '456.789.012-77', '(75) 96789-0123', '1973-03-19', 'paulo.silva@gmail.com', 'Pampalona', 'Feira de Santana', 'BA'),
-('Renata Santos', NULL, '567.890.123-66', '(75) 95678-9812', '1998-11-07', 'renata.santos@yahoo.com.br', 'Cidade Nova', 'Feira de Santana', 'BA'),
-('Marcelo Lima', NULL, '678.901.234-55', '(75) 94367-8901', '1985-06-30', 'marcelo.lima@gmail.com', 'Tomba', 'Feira de Santana', 'BA'),
-('Tatiane Pereira', NULL, '789.012.345-44', '(75) 93486-7890', '1990-12-15', 'tatiane.pereira@hotmail.com', 'Cidade Nova', 'Feira de Santana', 'BA'),
-('Roberto Oliveira', NULL, '890.123.456-33', '(75) 92345-6786', '1979-05-28', 'roberto.oliveira@yahoo.com.br', 'Sobradinho', 'Feira de Santana', 'BA'),
-('Carla Souza', NULL, '901.234.567-22', '(75) 91234-5673', '1988-09-03', 'carla.souza@gmail.com', 'Cidade Nova', 'Feira de Santana', 'BA'),
-('Luciano Santos', NULL, '012.345.678-11', '(75) 90123-4567', '1977-04-14', 'luciano.santos@hotmail.com', 'Cidade Nova', 'Feira de Santana', 'BA'),
-('Vanessa Lima', NULL, '123.456.789-00', '(75) 99012-3456', '1995-01-20', 'vanessa.lima@yahoo.com.br', 'Cidade Nova', 'Feira de Santana', 'BA');
-
--- 10. VIEW 4, lista todos os clientes do bairro Cidade Nova.
 
 CREATE VIEW clientes_bairro AS
 SELECT nome_completo, nome_social, cpf, telefone, data_nascimento, email, bairro, cidade, estado
@@ -603,6 +555,73 @@ SELECT * FROM clientes_pedidos_valor_superior_30;
 
 
 -- ----------------------------SEÇÃO DE GATILHOS-----------------------
+-- 8, GATILHO 1, gerar numero atribui um numero aleatorio ao pedido
+DELIMITER //
+
+CREATE TRIGGER before_insert_pedido
+BEFORE INSERT ON pedidos
+FOR EACH ROW
+BEGIN
+    SET NEW.numero_pedido = numero_aleatorio();
+END;
+//
+
+DELIMITER ;
+
+
+
+
+-- ----------------------------SEÇÃO DE FUNÇÕES------------------------
+-- 8. FUNÇÂO 1, calcular idade do cliente.
+CREATE FUNCTION fn_idade (data_nascimento DATE)
+RETURNS INT 
+DETERMINISTIC
+RETURN FLOOR(DATEDIFF(NOW(), data_nascimento)/365.25);
+
+SELECT *, fn_idade(data_nascimento) idade
+FROM clientes;
+
+-- 8. FUNÇÃO 2, calcula valor total do pedido.
+DELIMITER //
+
+CREATE FUNCTION fn_calcula_total_pedido (p_id_pedido INT) 
+RETURNS DECIMAL(10,2)
+READS SQL DATA
+BEGIN
+    DECLARE v_total DECIMAL(10,2);
+
+    SELECT SUM(ip.quantidade * COALESCE(t.preco, a.preco))
+    INTO v_total
+    FROM itens_pedido ip
+    LEFT JOIN tamanho_pasteis t ON ip.id_tamanho_pastel = t.id_tamanho_pasteis
+    LEFT JOIN acompanhamentos a ON ip.id_acompanhamento = a.id_acompanhamento
+    WHERE ip.id_pedido = p_id_pedido;
+
+    RETURN v_total;
+END;
+
+//
+
+DELIMITER ;
+
+SELECT fn_calcula_total_pedido(8) AS total;
+
+-- 8, FUNÇÃO 3, gerar um numero aleatorio, sera usado no gatilho de numero do pedido
+DELIMITER //
+
+CREATE FUNCTION numero_aleatorio() RETURNS INT
+DETERMINISTIC
+BEGIN
+    DECLARE random_number INT;
+    SET random_number = FLOOR(RAND() * 100) + 1; -- Gera um número aleatório entre 1 e 100
+    RETURN random_number;
+END //
+
+DELIMITER ;
+
+SELECT numero_aleatorio();
+
+-- ---------------------------SEÇÃO DE PROCEDURES----------------------
 
 
 
