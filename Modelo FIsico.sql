@@ -16,6 +16,43 @@ CREATE TABLE clientes(
     estado CHAR(2) NOT NULL
 );
 
+-- 9, GATILHO 1, verificar se o CPF já está cadastrado
+DELIMITER //
+
+CREATE TRIGGER verifica_cpf_unico
+BEFORE INSERT ON clientes
+FOR EACH ROW
+BEGIN
+    IF EXISTS (SELECT 1 FROM clientes WHERE cpf = NEW.cpf) THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'CPF já cadastrado';
+    END IF;
+END;
+//
+
+DELIMITER ;
+
+-- 9, GATILHO 2, verifica se o cliente ja tem um pedido
+DELIMITER //
+CREATE TRIGGER verifica_pedidos_cliente
+BEFORE DELETE ON clientes
+FOR EACH ROW
+BEGIN
+    DECLARE contador INT;
+    SELECT COUNT(*) INTO contador
+    FROM pedidos
+    WHERE id_clientes = OLD.id_clientes;
+    IF contador > 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Não é possível excluir cliente com pedidos associados';
+    END IF;
+END;
+//
+
+DELIMITER ;
+
+DELETE FROM clientes
+WHERE id_clientes = 11;
+
+
 SELECT * FROM clientes;
 
 -- Tabela de Pastéis
@@ -85,6 +122,61 @@ CREATE TABLE pedidos(
     forma_pagamento VARCHAR(50) NOT NULL,
     CONSTRAINT fk_pedidos_clientes FOREIGN KEY (id_clientes) REFERENCES clientes(id_clientes)
 );
+
+-- 9, GATILHO 3, gerar numero atribui um numero aleatorio ao pedido
+DELIMITER //
+
+CREATE TRIGGER before_insert_pedido
+BEFORE INSERT ON pedidos
+FOR EACH ROW
+BEGIN
+    SET NEW.numero_pedido = numero_aleatorio();
+END;
+//
+
+DELIMITER ;
+
+-- 9, GATILHO 4, garante que o pedido não seja feito numa data futura
+DELIMITER //
+
+CREATE TRIGGER verifica_data_pedido
+BEFORE INSERT ON pedidos
+FOR EACH ROW
+BEGIN
+    IF NEW.data_pedido > CURDATE() THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Data do pedido não pode ser no futuro';
+    END IF;
+END;
+//
+
+DELIMITER ;
+
+-- 9, GATILHO 5, Gatilho para verificar forma de pagamento
+
+DELIMITER //
+CREATE TRIGGER validar_forma_pagamento
+BEFORE INSERT ON pedidos
+FOR EACH ROW
+BEGIN
+    DECLARE forma_valida INT;
+    
+    SELECT COUNT(*) INTO forma_valida
+    FROM (
+        SELECT 'Dinheiro' AS forma
+        UNION SELECT 'Débito'
+        UNION SELECT 'Crédito'
+        UNION SELECT 'Pix'
+    ) AS formas_aceitas
+    WHERE forma = NEW.forma_pagamento;
+    
+    IF forma_valida = 0 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Forma de pagamento não aceita.';
+    END IF;
+END;
+//
+
+DELIMITER ;
 
 
 -- Tabela de Itens do pedido
@@ -275,9 +367,7 @@ INSERT INTO pedidos (id_clientes, data_pedido, forma_pagamento) VALUES
 (7, '2024-01-22', 'Crédito'),
 (8, '2024-05-04', 'Pix'),
 (9, '2023-12-31', 'Débito'),
-(10, '2024-01-01', 'Dinheiro');
-
-INSERT INTO pedidos (id_clientes, data_pedido, forma_pagamento) VALUES
+(10, '2024-01-01', 'Dinheiro'),
 (11, '2024-06-06', 'Dinheiro');
 
 
@@ -549,7 +639,7 @@ GROUP BY
 
 SELECT * FROM vendas_mensais_por_categoria;
 
--- 10. VIEW 10, lista os clientes que fizeram pedidos com valor total superior a 100 reais.
+-- 10. VIEW 10, lista os clientes que fizeram pedidos com valor total superior a 30 reais.
 CREATE VIEW clientes_pedidos_valor_superior_30 AS
 SELECT 
     c.id_clientes, 
@@ -564,105 +654,6 @@ HAVING
     total_pedido > 30;
     
 SELECT * FROM clientes_pedidos_valor_superior_30;
-
-
--- ----------------------------SEÇÃO DE GATILHOS-----------------------
--- 9, GATILHO 1, gerar numero atribui um numero aleatorio ao pedido
-DELIMITER //
-
-CREATE TRIGGER before_insert_pedido
-BEFORE INSERT ON pedidos
-FOR EACH ROW
-BEGIN
-    SET NEW.numero_pedido = numero_aleatorio();
-END;
-//
-
-DELIMITER ;
-
--- 9, GATILHO 2, verificar se o CPF já está cadastrado
-DELIMITER //
-
-CREATE TRIGGER verifica_cpf_unico
-BEFORE INSERT ON clientes
-FOR EACH ROW
-BEGIN
-    IF EXISTS (SELECT 1 FROM clientes WHERE cpf = NEW.cpf) THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'CPF já cadastrado';
-    END IF;
-END;
-//
-
-DELIMITER ;
-
--- 9, GATILHO 3, garante que o pedido não seja feito numa data futura
-DELIMITER //
-
-CREATE TRIGGER verifica_data_pedido
-BEFORE INSERT ON pedidos
-FOR EACH ROW
-BEGIN
-    IF NEW.data_pedido > CURDATE() THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Data do pedido não pode ser no futuro';
-    END IF;
-END;
-//
-
-DELIMITER ;
-
-INSERT INTO pedidos (id_clientes, data_pedido, forma_pagamento) VALUES
-(12, '2024-06-09', 'dinheiro');
-
--- 9, GATILHO 4, Gatilho para verificar forma de pagamento
-
-DELIMITER //
-CREATE TRIGGER validar_forma_pagamento
-BEFORE INSERT ON pedidos
-FOR EACH ROW
-BEGIN
-    DECLARE forma_valida INT;
-    
-    SELECT COUNT(*) INTO forma_valida
-    FROM (
-        SELECT 'Dinheiro' AS forma
-        UNION SELECT 'Débito'
-        UNION SELECT 'Crédito'
-        UNION SELECT 'Pix'
-    ) AS formas_aceitas
-    WHERE forma = NEW.forma_pagamento;
-    
-    IF forma_valida = 0 THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Forma de pagamento não aceita.';
-    END IF;
-END;
-//
-
-DELIMITER ;
-
--- 9, GATILHO 5, validar email
-DELIMITER //
-CREATE TRIGGER verifica_pedidos_cliente
-BEFORE DELETE ON clientes
-FOR EACH ROW
-BEGIN
-    DECLARE contador INT;
-    SELECT COUNT(*) INTO contador
-    FROM pedidos
-    WHERE id_clientes = OLD.id_clientes;
-    IF contador > 0 THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Não é possível excluir cliente com pedidos associados';
-    END IF;
-END;
-//
-
-DELIMITER ;
-
-DELETE FROM clientes
-WHERE id_clientes = 11;
-
-
-
 
 -- ----------------------------SEÇÃO DE FUNÇÕES------------------------
 -- 8. FUNÇÂO 1, calcular idade do cliente.
