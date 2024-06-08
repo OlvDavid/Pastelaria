@@ -76,6 +76,15 @@ CREATE TABLE acompanhamentos(
 );
 
 SELECT * FROM acompanhamentos;
+-- Tabela de Pedidos
+CREATE TABLE pedidos(
+	id_pedidos INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    id_clientes INT NOT NULL,
+    numero_pedido INT NOT NULL,
+    data_pedido DATE NOT NULL,
+    forma_pagamento VARCHAR(50) NOT NULL,
+    CONSTRAINT fk_pedidos_clientes FOREIGN KEY (id_clientes) REFERENCES clientes(id_clientes)
+);
 
 -- Tabela de Itens do pedido
 CREATE TABLE itens_pedido(
@@ -87,16 +96,6 @@ CREATE TABLE itens_pedido(
     CONSTRAINT fk_itens_pedido_produtos FOREIGN KEY (id_acompanhamento) REFERENCES acompanhamentos(id_acompanhamento),
     CONSTRAINT fk_itens_pedido_pedido FOREIGN KEY (id_pedido) REFERENCES pedidos(id_pedidos),
     CONSTRAINT fk_itens_pedido_tamanho_pastel FOREIGN KEY (id_tamanho_pastel) REFERENCES tamanho_pasteis(id_tamanho_pasteis)
-);
-
--- Tabela de Pedidos
-CREATE TABLE pedidos(
-	id_pedidos INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-    id_clientes INT NOT NULL,
-    numero_pedido INT NOT NULL,
-    data_pedido DATE NOT NULL,
-    forma_pagamento VARCHAR(50) NOT NULL,
-    CONSTRAINT fk_pedidos_clientes FOREIGN KEY (id_clientes) REFERENCES clientes(id_clientes)
 );
 
 
@@ -157,6 +156,10 @@ INSERT INTO clientes(nome_completo, nome_social, cpf, telefone, data_nascimento,
 ('Carla Souza', NULL, '901.234.567-22', '(75) 91234-5673', '1988-09-03', 'carla.souza@gmail.com', 'Cidade Nova', 'Feira de Santana', 'BA'),
 ('Luciano Santos', NULL, '012.345.678-11', '(75) 90123-4567', '1977-04-14', 'luciano.santos@hotmail.com', 'Cidade Nova', 'Feira de Santana', 'BA'),
 ('Vanessa Lima', NULL, '123.456.789-00', '(75) 99012-3456', '1995-01-20', 'vanessa.lima@yahoo.com.br', 'Cidade Nova', 'Feira de Santana', 'BA');
+
+
+INSERT INTO clientes(nome_completo, nome_social, cpf, telefone, data_nascimento, email, bairro, cidade, estado) VALUES
+('lucas da Silva Oliveira', 'David', '089.765.324-36', '(75) 99263-3400', '2003-05-04', 'lucasda123@gmail.com', 'Pampalona', 'Feira de Santana', 'BA');
 
 
 
@@ -555,7 +558,7 @@ SELECT * FROM clientes_pedidos_valor_superior_30;
 
 
 -- ----------------------------SEÇÃO DE GATILHOS-----------------------
--- 8, GATILHO 1, gerar numero atribui um numero aleatorio ao pedido
+-- 9, GATILHO 1, gerar numero atribui um numero aleatorio ao pedido
 DELIMITER //
 
 CREATE TRIGGER before_insert_pedido
@@ -567,6 +570,22 @@ END;
 //
 
 DELIMITER ;
+
+-- 9, GATILHO 2, verificar se o CPF já está cadastrado
+DELIMITER //
+
+CREATE TRIGGER verifica_cpf_unico
+BEFORE INSERT ON clientes
+FOR EACH ROW
+BEGIN
+    IF EXISTS (SELECT 1 FROM clientes WHERE cpf = NEW.cpf) THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'CPF já cadastrado';
+    END IF;
+END;
+//
+
+DELIMITER ;
+
 
 
 
