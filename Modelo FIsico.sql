@@ -86,6 +86,7 @@ CREATE TABLE pedidos(
     CONSTRAINT fk_pedidos_clientes FOREIGN KEY (id_clientes) REFERENCES clientes(id_clientes)
 );
 
+
 -- Tabela de Itens do pedido
 CREATE TABLE itens_pedido(
 	id_itens_pedido INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
@@ -259,6 +260,9 @@ INSERT INTO itens_pedido (id_acompanhamento, id_pedido, id_tamanho_pastel, quant
 (6, 8, 45, 3),
 (8, 9, 43, 8);
 
+INSERT INTO itens_pedido (id_acompanhamento, id_pedido, id_tamanho_pastel, quantidade) VALUES
+(8, 11, 45, 2);
+
 SELECT * FROM itens_pedido;
 
 INSERT INTO pedidos (id_clientes, data_pedido, forma_pagamento) VALUES
@@ -272,6 +276,11 @@ INSERT INTO pedidos (id_clientes, data_pedido, forma_pagamento) VALUES
 (8, '2024-05-04', 'Pix'),
 (9, '2023-12-31', 'Débito'),
 (10, '2024-01-01', 'Dinheiro');
+
+INSERT INTO pedidos (id_clientes, data_pedido, forma_pagamento) VALUES
+(11, '2024-06-06', 'Dinheiro');
+
+
 
 
 SELECT * FROM pedidos;
@@ -604,6 +613,32 @@ DELIMITER ;
 INSERT INTO pedidos (id_clientes, data_pedido, forma_pagamento) VALUES
 (12, '2024-06-09', 'dinheiro');
 
+-- 9, GATILHO 4, Gatilho para verificar forma de pagamento
+
+DELIMITER //
+CREATE TRIGGER validar_forma_pagamento
+BEFORE INSERT ON pedidos
+FOR EACH ROW
+BEGIN
+    DECLARE forma_valida INT;
+    
+    SELECT COUNT(*) INTO forma_valida
+    FROM (
+        SELECT 'Dinheiro' AS forma
+        UNION SELECT 'Débito'
+        UNION SELECT 'Crédito'
+        UNION SELECT 'Pix'
+    ) AS formas_aceitas
+    WHERE forma = NEW.forma_pagamento;
+    
+    IF forma_valida = 0 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Forma de pagamento não aceita.';
+    END IF;
+END;
+//
+
+DELIMITER ;
 
 
 
