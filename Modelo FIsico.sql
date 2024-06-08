@@ -586,6 +586,24 @@ END;
 
 DELIMITER ;
 
+-- 9, GATILHO 3, garante que o pedido não seja feito numa data futura
+DELIMITER //
+
+CREATE TRIGGER verifica_data_pedido
+BEFORE INSERT ON pedidos
+FOR EACH ROW
+BEGIN
+    IF NEW.data_pedido > CURDATE() THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Data do pedido não pode ser no futuro';
+    END IF;
+END;
+//
+
+DELIMITER ;
+
+INSERT INTO pedidos (id_clientes, data_pedido, forma_pagamento) VALUES
+(12, '2024-06-09', 'dinheiro');
+
 
 
 
