@@ -446,3 +446,105 @@ FROM clientes
 WHERE  bairro = 'Cidade Nova';
 
 SELECT * FROM clientes_bairro;
+
+-- 10. VIEW 5, lista os pedidos mais recentes.
+
+CREATE VIEW pedidos_mais_recentes AS
+SELECT 
+    p.id_pedidos, 
+    c.nome_completo, 
+    p.data_pedido, 
+    p.forma_pagamento
+FROM 
+    pedidos p
+JOIN 
+    clientes c ON p.id_clientes = c.id_clientes
+WHERE 
+    p.data_pedido >= CURDATE() - INTERVAL 30 DAY;
+
+SELECT * FROM pedidos_mais_recentes;
+
+-- 10. VIEW 6, lista os clientes com mais de 20 pedidos.
+
+CREATE VIEW clientes_com_mais_de_20_pedidos AS
+SELECT 
+    c.id_clientes, 
+    c.nome_completo, 
+    COUNT(p.id_pedidos) AS total_pedidos
+FROM 
+    clientes c
+JOIN 
+    pedidos p ON c.id_clientes = p.id_clientes
+GROUP BY 
+    c.id_clientes
+HAVING 
+    COUNT(p.id_pedidos) > 20;
+
+SELECT * FROM clientes_com_mais_pedidos;
+
+-- 10. VIEW 7, lista os pasteis mais vendidos no mes.
+
+CREATE VIEW pasteis_mais_vendidos_no_mes AS
+SELECT 
+    p.descricao AS Pastel, 
+    COUNT(ip.id_itens_pedido) AS total_vendas
+FROM 
+    pasteis p
+JOIN 
+    tamanho_pasteis tp ON p.id_pasteis = tp.id_pasteis
+JOIN 
+    itens_pedido ip ON tp.id_tamanho_pasteis = ip.id_tamanho_pastel
+JOIN 
+    pedidos pe ON ip.id_pedido = pe.id_pedidos
+WHERE 
+    MONTH(pe.data_pedido) = MONTH(CURDATE())
+    AND YEAR(pe.data_pedido) = YEAR(CURDATE())
+GROUP BY 
+    p.descricao
+ORDER BY 
+    total_vendas DESC;
+
+SELECT * FROM pasteis_mais_vendidos_no_mes;
+
+-- 10. VIEW 8, lista os bairros que mais compram.
+
+CREATE VIEW bairros_que_mais_compra AS
+SELECT 
+    c.bairro, 
+    c.nome_completo, 
+    COUNT(p.id_pedidos) AS total_pedidos
+FROM 
+    pedidos p
+JOIN 
+    clientes c ON p.id_clientes = c.id_clientes
+GROUP BY 
+    c.bairro, 
+    c.nome_completo
+ORDER BY 
+    c.bairro, 
+    total_pedidos DESC;
+
+SELECT * FROM bairros_que_mais_compra;
+
+-- 10. VIEW 9, lista o total de vendas mensais agrupadas por categoria de produto.
+
+CREATE VIEW vendas_mensais_por_categoria AS
+SELECT 
+    MONTH(p.data_pedido) AS mes, 
+    YEAR(p.data_pedido) AS ano, 
+    ac.categoria AS categoria_produto, 
+    SUM(ip.quantidade * tp.preco) AS total_vendas
+FROM 
+    pedidos p
+JOIN 
+    itens_pedido ip ON p.id_pedidos = ip.id_pedido
+JOIN 
+    acompanhamentos ac ON ip.id_acompanhamento = ac.id_acompanhamento
+JOIN 
+    tamanho_pasteis tp ON ip.id_tamanho_pastel = tp.id_tamanho_pasteis
+GROUP BY 
+    YEAR(p.data_pedido), 
+    MONTH(p.data_pedido), 
+    ac.categoria;
+
+SELECT * FROM vendas_mensais_por_categoria;
