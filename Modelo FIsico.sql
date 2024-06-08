@@ -677,6 +677,23 @@ DELIMITER ;
 
 CALL atualizar_preco_acompanhamento('Suco de Laranja', 7.00);
 
+-- 7,PROCEDURE 2, mudar o nome do clientes
+DELIMITER //
+
+CREATE PROCEDURE atualizar_nome_cliente(
+    IN id_cliente INT,
+    IN novo_nome VARCHAR(45)
+)
+BEGIN
+    UPDATE clientes
+    SET nome_completo = novo_nome
+    WHERE id_clientes = id_cliente;
+END //
+
+DELIMITER ;
+
+CALL atualizar_nome_cliente(1, 'Luis da Silva Carvaho');
+
 
 
 
