@@ -358,16 +358,29 @@ JOIN
     itens_pedido ip ON p.id_pedidos = ip.id_pedido 
 JOIN 
     acompanhamentos ac ON ip.id_acompanhamento = ac.id_acompanhamento 
-JOIN 
+LEFT JOIN 
     tamanho_pasteis tp ON ip.id_tamanho_pastel = tp.id_tamanho_pasteis 
-JOIN 
+LEFT JOIN 
     pasteis pst ON tp.id_pasteis = pst.id_pasteis -- Junção com a tabela de pasteis 
 WHERE 
-    ac.categoria = 'Bebida' OR ac.id_acompanhamento IN (SELECT id_pasteis FROM tamanho_pasteis) 
+    p.id_pedidos IN (
+        SELECT p1.id_pedidos 
+        FROM pedidos p1
+        JOIN itens_pedido ip1 ON p1.id_pedidos = ip1.id_pedido 
+        JOIN acompanhamentos ac1 ON ip1.id_acompanhamento = ac1.id_acompanhamento 
+        WHERE ac1.categoria = 'Bebida'
+    )
+    AND p.id_pedidos IN (
+        SELECT p2.id_pedidos 
+        FROM pedidos p2
+        JOIN itens_pedido ip2 ON p2.id_pedidos = ip2.id_pedido 
+        JOIN tamanho_pasteis tp2 ON ip2.id_tamanho_pastel = tp2.id_tamanho_pasteis
+    )
 GROUP BY 
     p.id_pedidos, p.data_pedido, c.nome_completo, ac.descricao, ac.categoria, pst.descricao, tp.tamanho;
 
 SELECT * FROM view_pedidos_pastel_bebida;
+
 
 -- 6. Liste quais são os pastéis mais vendidos, incluindo a quantidade de vendas em ordem decrescente.
 CREATE OR REPLACE VIEW view_pasteis_mais_vendidos AS
@@ -420,7 +433,7 @@ END;
 
 DELIMITER ;
 
-SELECT fn_calcula_total_pedido(9) AS total;
+SELECT fn_calcula_total_pedido(8) AS total;
     
 
 -- 10. VIEW 1, lista todas as vendas feitas no débito. 
@@ -472,8 +485,7 @@ WHERE  bairro = 'Cidade Nova';
 
 SELECT * FROM clientes_bairro;
 
--- 10. VIEW 5, lista os pedidos mais recentes.
-
+-- 10. VIEW 5, lista os pedidos mais recentes nos ultimos 30 dias
 CREATE VIEW pedidos_mais_recentes AS
 SELECT 
     p.id_pedidos, 
@@ -489,9 +501,9 @@ WHERE
 
 SELECT * FROM pedidos_mais_recentes;
 
--- 10. VIEW 6, lista os clientes com mais de 20 pedidos.
+-- 10. VIEW 6, lista os clientes com mais de 2 pedidos.
 
-CREATE VIEW clientes_com_mais_de_20_pedidos AS
+CREATE VIEW clientes_com_mais_pedidos AS
 SELECT 
     c.id_clientes, 
     c.nome_completo, 
@@ -503,12 +515,11 @@ JOIN
 GROUP BY 
     c.id_clientes
 HAVING 
-    COUNT(p.id_pedidos) > 20;
+    COUNT(p.id_pedidos) > 2;
 
 SELECT * FROM clientes_com_mais_pedidos;
 
 -- 10. VIEW 7, lista os pasteis mais vendidos no mes.
-
 CREATE VIEW pasteis_mais_vendidos_no_mes AS
 SELECT 
     p.descricao AS Pastel, 
@@ -573,3 +584,29 @@ GROUP BY
     ac.categoria;
 
 SELECT * FROM vendas_mensais_por_categoria;
+
+-- 10. VIEW 10, lista os clientes que fizeram pedidos com valor total superior a 100 reais.
+CREATE VIEW clientes_pedidos_valor_superior_30 AS
+SELECT 
+    c.id_clientes, 
+    c.nome_completo, 
+    p.id_pedidos, 
+    fn_calcula_total_pedido(p.id_pedidos) AS total_pedido
+FROM 
+    clientes c
+JOIN 
+    pedidos p ON c.id_clientes = p.id_clientes
+HAVING 
+    total_pedido > 30;
+    
+SELECT * FROM clientes_pedidos_valor_superior_30;
+
+
+-- ----------------------------SEÇÃO DE GATILHOS-----------------------
+
+
+
+
+
+
+
