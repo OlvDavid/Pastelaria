@@ -640,6 +640,27 @@ END;
 
 DELIMITER ;
 
+-- 9, GATILHO 5, validar email
+DELIMITER //
+CREATE TRIGGER verifica_pedidos_cliente
+BEFORE DELETE ON clientes
+FOR EACH ROW
+BEGIN
+    DECLARE contador INT;
+    SELECT COUNT(*) INTO contador
+    FROM pedidos
+    WHERE id_clientes = OLD.id_clientes;
+    IF contador > 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Não é possível excluir cliente com pedidos associados';
+    END IF;
+END;
+//
+
+DELIMITER ;
+
+DELETE FROM clientes
+WHERE id_clientes = 11;
+
 
 
 
