@@ -694,6 +694,22 @@ DELIMITER ;
 
 CALL atualizar_nome_cliente(1, 'Luis da Silva Carvaho');
 
+DELIMITER //
+
+-- 7,PROCEDURE 3, buscar cliente por bairro
+CREATE PROCEDURE listar_clientes_por_bairro(
+    IN nome_bairro VARCHAR(50)
+)
+BEGIN
+    SELECT * FROM clientes WHERE bairro = nome_bairro;
+END //
+
+DELIMITER ;
+
+CALL listar_clientes_por_bairro('Centro');
+
+
+
 
 
 
