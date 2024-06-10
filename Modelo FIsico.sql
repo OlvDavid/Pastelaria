@@ -358,6 +358,13 @@ INSERT INTO pedidos (id_clientes, data_pedido, forma_pagamento) VALUES
 (12, '2024-02-22', 'Dinheiro'),
 (13, '2023-04-05', 'Crédito');
 
+INSERT INTO pedidos (id_clientes, data_pedido, forma_pagamento) VALUES
+(14, '2022-10-01', 'Pix'),
+(2, '2021-05-05', 'Pix'),
+(15, '2024-03-22', 'Pix'),
+(15, '2023-05-07', 'Dinheiro'),
+(15, '2024-04-22', 'Pix');
+
 SELECT * FROM pedidos;
 
 
@@ -378,7 +385,57 @@ INSERT INTO itens_pedido (id_acompanhamento, id_pedido, id_tamanho_pastel, quant
 (2, 13, 10, 1);
 
 INSERT INTO itens_pedido (id_acompanhamento, id_pedido, id_tamanho_pastel, quantidade) VALUES
-(3, 14, 5, 1);
+(3, 14, 5, 1),
+(2, 15, 10, 2),
+(4, 16, 20, 3),
+(1, 16, 30, 1),
+(1, 17, 3, 2),
+(6, 18, 7, 1),
+(2, 19, 21, 3);
+
+
+-- VIEW DE DETALHES DO PEDIDO
+CREATE VIEW detalhes_pedido AS
+SELECT 
+    p.id_pedidos AS pedido_id, 
+    p.data_pedido, 
+    c.nome_completo AS cliente_nome, 
+    MIN(ip.id_itens_pedido) AS item_pedido_id, 
+    ac.descricao AS produto_nome, 
+    ac.categoria AS categoria_acompanhamento, 
+    pst.descricao AS descricao_pastel, -- Substituído pelo nome do pastel 
+    tp.tamanho AS tamanho_pastel 
+FROM 
+    pedidos p 
+JOIN 
+    clientes c ON p.id_clientes = c.id_clientes 
+JOIN 
+    itens_pedido ip ON p.id_pedidos = ip.id_pedido 
+JOIN 
+    acompanhamentos ac ON ip.id_acompanhamento = ac.id_acompanhamento 
+LEFT JOIN 
+    tamanho_pasteis tp ON ip.id_tamanho_pastel = tp.id_tamanho_pasteis 
+LEFT JOIN 
+    pasteis pst ON tp.id_pasteis = pst.id_pasteis -- Junção com a tabela de pasteis 
+WHERE 
+    p.id_pedidos IN (
+        SELECT p1.id_pedidos 
+        FROM pedidos p1
+        JOIN itens_pedido ip1 ON p1.id_pedidos = ip1.id_pedido 
+        JOIN acompanhamentos ac1 ON ip1.id_acompanhamento = ac1.id_acompanhamento 
+        WHERE ac1.categoria = 'Bebida'
+    )
+    AND p.id_pedidos IN (
+        SELECT p2.id_pedidos 
+        FROM pedidos p2
+        JOIN itens_pedido ip2 ON p2.id_pedidos = ip2.id_pedido 
+        JOIN tamanho_pasteis tp2 ON ip2.id_tamanho_pastel = tp2.id_tamanho_pasteis
+    )
+GROUP BY 
+    p.id_pedidos, p.data_pedido, c.nome_completo, ac.descricao, ac.categoria, pst.descricao, tp.tamanho;
+
+SELECT * FROM detalhes_pedido;
+
 
 
 SELECT p.id_pedidos, c.nome_completo, p.data_pedido, p.forma_pagamento
