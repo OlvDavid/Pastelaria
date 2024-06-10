@@ -113,6 +113,7 @@ CREATE TABLE acompanhamentos(
 );
 
 SELECT * FROM acompanhamentos;
+
 -- Tabela de Pedidos
 CREATE TABLE pedidos(
 	id_pedidos INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
@@ -341,22 +342,6 @@ INSERT INTO tamanho_pasteis(tamanho, preco, id_pasteis) VALUES
 
 SELECT * FROM tamanho_pasteis;
 
-INSERT INTO itens_pedido (id_acompanhamento, id_pedido, id_tamanho_pastel, quantidade) VALUES
-(1, 1, 27, 2),
-(3, 2, 33, 3),
-(2, 3, 22, 1),
-(5, 4, 20, 1),
-(7, 5, 17, 2),
-(4, 6, 3, 4),
-(3, 7, 19, 5),
-(6, 8, 45, 3),
-(8, 9, 43, 8);
-
-INSERT INTO itens_pedido (id_acompanhamento, id_pedido, id_tamanho_pastel, quantidade) VALUES
-(8, 11, 45, 2);
-
-SELECT * FROM itens_pedido;
-
 INSERT INTO pedidos (id_clientes, data_pedido, forma_pagamento) VALUES
 (1, '2023-05-31', 'Dinheiro'),
 (2, '2023-05-29', 'Débito'),
@@ -368,12 +353,41 @@ INSERT INTO pedidos (id_clientes, data_pedido, forma_pagamento) VALUES
 (8, '2024-05-04', 'Pix'),
 (9, '2023-12-31', 'Débito'),
 (10, '2024-01-01', 'Dinheiro'),
-(11, '2024-06-06', 'Dinheiro');
-
-
-
+(11, '2024-06-06', 'Dinheiro'),
+(12, '2024-01-03', 'Débito'),
+(12, '2024-02-22', 'Dinheiro'),
+(13, '2023-04-05', 'Crédito');
 
 SELECT * FROM pedidos;
+
+
+INSERT INTO itens_pedido (id_acompanhamento, id_pedido, id_tamanho_pastel, quantidade) VALUES
+(1, 1, 27, 2),
+(3, 2, 33, 3),
+(2, 3, 22, 1),
+(5, 4, 20, 1),
+(7, 5, 17, 2),
+(4, 6, 3, 4),
+(3, 7, 19, 5),
+(6, 8, 45, 3),
+(8, 9, 43, 8),
+(1, 10, 32, 2),
+(2, 11, 21, 1),
+(4, 12, 15, 2),
+(5, 12, 12, 2),
+(2, 13, 10, 1);
+
+INSERT INTO itens_pedido (id_acompanhamento, id_pedido, id_tamanho_pastel, quantidade) VALUES
+(3, 14, 5, 1);
+
+
+SELECT p.id_pedidos, c.nome_completo, p.data_pedido, p.forma_pagamento
+FROM pedidos p
+JOIN clientes c ON p.id_clientes = c.id_clientes;
+
+SELECT * FROM pedidos;
+
+SELECT * FROM itens_pedido;
 
 -- ----------------------------------------SEÇÃO DE VIEWS---------------------------------
 
@@ -555,7 +569,7 @@ WHERE
 
 SELECT * FROM pedidos_mais_recentes;
 
--- 10. VIEW 6, lista os clientes com mais de 2 pedidos.
+-- 10. VIEW 6, lista os clientes com mais de 1 pedido.
 
 CREATE VIEW clientes_com_mais_pedidos AS
 SELECT 
@@ -569,8 +583,8 @@ JOIN
 GROUP BY 
     c.id_clientes
 HAVING 
-    COUNT(p.id_pedidos) > 2;
-
+    COUNT(p.id_pedidos) > 1;
+    
 SELECT * FROM clientes_com_mais_pedidos;
 
 -- 10. VIEW 7, lista os pasteis mais vendidos no mes.
