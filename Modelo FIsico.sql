@@ -342,6 +342,21 @@ INSERT INTO tamanho_pasteis(tamanho, preco, id_pasteis) VALUES
 
 SELECT * FROM tamanho_pasteis;
 
+-- 8, FUNÇÃO 3, gerar um numero aleatorio, sera usado no gatilho de numero do pedido
+DELIMITER //
+
+CREATE FUNCTION numero_aleatorio() RETURNS INT
+DETERMINISTIC
+BEGIN
+    DECLARE random_number INT;
+    SET random_number = FLOOR(RAND() * 100) + 1; -- Gera um número aleatório entre 1 e 100
+    RETURN random_number;
+END //
+
+DELIMITER ;
+
+SELECT numero_aleatorio();
+
 INSERT INTO pedidos (id_clientes, data_pedido, forma_pagamento) VALUES
 (1, '2023-05-31', 'Dinheiro'),
 (2, '2023-05-29', 'Débito'),
@@ -357,6 +372,29 @@ INSERT INTO pedidos (id_clientes, data_pedido, forma_pagamento) VALUES
 (12, '2024-01-03', 'Débito'),
 (12, '2024-02-22', 'Dinheiro'),
 (13, '2023-04-05', 'Crédito');
+
+INSERT INTO pedidos (id_clientes, data_pedido, forma_pagamento) VALUES
+(5, '2024-01-15', 'Crédito'),
+(6, '2024-01-28', 'Pix'),
+(7, '2024-02-05', 'Débito'),
+(8, '2024-02-15', 'Dinheiro'),
+(9, '2024-03-10', 'Pix'),
+(10, '2024-03-25', 'Crédito'),
+(11, '2024-04-05', 'Débito'),
+(12, '2024-04-20', 'Dinheiro'),
+(13, '2024-05-02', 'Pix'),
+(14, '2024-05-10', 'Crédito'),
+(15, '2024-05-18', 'Débito'),
+(16, '2024-05-25', 'Dinheiro'),
+(17, '2024-06-01', 'Pix'),
+(18, '2024-06-05', 'Crédito'),
+(19, '2024-06-08', 'Débito'),
+(20, '2024-06-10', 'Dinheiro'),
+(1, '2024-01-10', 'Pix'),
+(2, '2024-02-12', 'Crédito'),
+(3, '2024-03-15', 'Débito'),
+(4, '2024-04-18', 'Dinheiro');
+
 
 INSERT INTO pedidos (id_clientes, data_pedido, forma_pagamento) VALUES
 (14, '2022-10-01', 'Pix'),
@@ -377,7 +415,9 @@ INSERT INTO pedidos (id_clientes, data_pedido, forma_pagamento) VALUES
 (13, '2024-04-12', 'Dinheiro'),
 (14, '2024-05-22', 'Débito'),
 (15, '2024-06-05', 'Crédito'),
-(16, '2024-06-10', 'Pix');
+(16, '2024-06-10', 'Pix'),
+(10, '2024-05-30', 'Pix'),
+(15, '2024-06-09', 'Crédito');
 
 SELECT * FROM pedidos;
 
@@ -440,7 +480,9 @@ INSERT INTO itens_pedido (id_acompanhamento, id_pedido, id_tamanho_pastel, quant
 (3, 51, 21, 1),
 (4, 52, 15, 2),
 (5, 53, 12, 2),
-(6, 54, 10, 1);
+(6, 54, 10, 1),
+(3, 55, 9, 1);
+
 
 -- VIEW DE DETALHES DO PEDIDO
 CREATE VIEW detalhes_pedido AS
@@ -809,20 +851,6 @@ DELIMITER ;
 
 SELECT fn_calcula_total_pedido(8) AS total;
 
--- 8, FUNÇÃO 3, gerar um numero aleatorio, sera usado no gatilho de numero do pedido
-DELIMITER //
-
-CREATE FUNCTION numero_aleatorio() RETURNS INT
-DETERMINISTIC
-BEGIN
-    DECLARE random_number INT;
-    SET random_number = FLOOR(RAND() * 100) + 1; -- Gera um número aleatório entre 1 e 100
-    RETURN random_number;
-END //
-
-DELIMITER ;
-
-SELECT numero_aleatorio();
 
 -- ---------------------------SEÇÃO DE PROCEDURES----------------------
 
