@@ -601,8 +601,12 @@ GROUP BY
     p.descricao;
     
 -- 4 Mostre o valor de venda total de todos os pastéis cadastrados no sistema.
-SELECT CONCAT(SUM(preco * tamanho), ' Reais') AS valor_total_venda
-FROM tamanho_pasteis;
+CREATE OR REPLACE VIEW valor_pasteis_vendidos_view AS
+SELECT CONCAT('R$', FORMAT(SUM(ip.quantidade * t.preco), 2)) AS valor_total_venda_pasteis
+FROM itens_pedido ip
+JOIN tamanho_pasteis t ON ip.id_tamanho_pastel = t.id_tamanho_pasteis;
+
+SELECT * FROM valor_pasteis_vendidos_view;
 
 -- 5 Liste todos os pedidos onde há pelo menos um pastel e uma bebida.
 CREATE OR REPLACE VIEW view_pedidos_pastel_bebida AS 
